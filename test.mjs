@@ -29,7 +29,8 @@ test('rejects on timeout', async function(t) {
   t.plan(1);
   
   try {
-    await once(emitter, 'changed', { timeout: 100 });
+    const result = await once(emitter, 'changed', { timeout: 100 });
+    t.fail(result);
   } catch (error) {
     t.ok(error);
   }
@@ -42,9 +43,7 @@ test('resolves when resolveOn returns true', async function(t) {
   try {
     const promise = once(emitter, 'changed', {
       timeout: 100,
-      resolveOn: (...args) => {
-        return args[0] === 'changed argument';
-      }
+      resolveOn: (...args) => (args[0] === 'changed argument')
     });
 
     emitter.emit('not changed', 'not changed argument');
@@ -66,19 +65,58 @@ test('rejects when rejectOn returns true', async function(t) {
   try {
     const promise = once(emitter, 'changed', {
       timeout: 100,
-      rejectOn: (...args) => {
-        return args[0] === 'changed argument';
-      }
+      rejectOn: (...args) => (args[0] === 'changed argument')
     });
 
     emitter.emit('not changed', 'not changed argument');
     emitter.emit('still not changed', 'still not changed argument');
     emitter.emit('changed', 'changed argument');
 
-    await promise;
+    const result = await promise;
+    t.fail(result);
   } catch (error) {
     t.ok(error);
   }
 });
 
+test('resolves when event that satisfies resolvesOn is emitted before one that satisfies rejectsOn', async function(t) {
+  const emitter = new EventEmitter();
+  t.plan(1);
 
+  try {
+    const promise = once(emitter, 'changed', {
+      timeout: 100,
+      resolveOn: (...args) => (args[0] === 'pass'),
+      rejectOn: (...args) => (args[0] === 'fail')
+    });
+
+    emitter.emit('changed', 'pass');
+    emitter.emit('changed', 'fail');
+
+    const result = await promise;
+    t.ok(result);
+  } catch (error) {
+    t.fail(error);
+  }
+});
+
+test('rejects when event that satisfies rejectsOn is emitted before one that satisfies resolvesOn', async function(t) {
+  const emitter = new EventEmitter();
+  t.plan(1);
+
+  try {
+    const promise = once(emitter, 'changed', {
+      timeout: 100,
+      resolveOn: (...args) => (args[0] === 'pass'),
+      rejectOn: (...args) => (args[0] === 'fail')
+    });
+
+    emitter.emit('changed', 'fail');
+    emitter.emit('changed', 'pass');
+
+    const result = await promise;
+    t.fail(result);
+  } catch (error) {
+    t.ok(error);
+  }
+});
