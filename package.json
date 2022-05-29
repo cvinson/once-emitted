@@ -1,0 +1,20 @@
+{
+  "name": "once-emitted",
+  "version": "0.1.0",
+  "description": "Wrap an EventEmitter in a Promise that resolves once your specified conditions are met.",
+  "main": "main.js",
+  "scripts": {
+    "test": "node ./test.mjs"
+  },
+  "keywords": [
+    "once",
+    "eventemitter",
+    "promise"
+  ],
+  "author": "Colin Vinson",
+  "license": "MIT",
+  "devDependencies": {
+    "esbuild": "^0.14.41",
+    "tape": "^5.5.3"
+  }
+}
