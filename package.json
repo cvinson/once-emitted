@@ -2,9 +2,17 @@
   "name": "once-emitted",
   "version": "0.1.0",
   "description": "Wrap an EventEmitter in a Promise that resolves once your specified conditions are met.",
-  "main": "main.js",
+  "main": "dist/cjs/index.js",
+  "module": "dist/mjs/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/mjs/index.js",
+      "require": "./dist/cjs/index.js"
+    }
+  },
   "scripts": {
-    "test": "node ./test.mjs"
+    "build": "rm -rf dist/* && tsc -p tsconfig.json && tsc -p tsconfig-cjs.json && ./fixup",
+    "test": "npx ts-node -O '{\"module\":\"commonjs\"}' ./test/once-emitted.test.ts"
   },
   "keywords": [
     "once",
@@ -14,7 +22,11 @@
   "author": "Colin Vinson",
   "license": "MIT",
   "devDependencies": {
+    "@types/node": "^17.0.36",
+    "@types/tape": "^4.13.2",
     "esbuild": "^0.14.41",
-    "tape": "^5.5.3"
+    "tape": "^5.5.3",
+    "ts-node": "^10.8.0",
+    "typescript": "^4.7.2"
   }
 }

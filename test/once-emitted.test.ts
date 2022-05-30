@@ -1,8 +1,8 @@
-import EventEmitter from 'events';
-import { once } from './once-emitted.mjs';
-import { test } from 'tape';
+import { EventEmitter } from 'events';
+import { once } from '../src/once-emitted';
+import test from 'tape';
 
-test('resolves on first invocation if no resolveOn or rejectOn functions are passed', async function(t) {
+test('resolves on first invocation if no resolveOn or rejectOn functions are passed', async function(t: any) {
   const emitter = new EventEmitter();
   const promise = once(emitter, 'changed');
 
@@ -12,7 +12,7 @@ test('resolves on first invocation if no resolveOn or rejectOn functions are pas
   t.ok(result);
 });
 
-test('does not resolve on other events', async function(t) {
+test('does not resolve on other events', async function(t: any) {
   const emitter = new EventEmitter();
   const promise = once(emitter, 'changed');
 
@@ -24,26 +24,25 @@ test('does not resolve on other events', async function(t) {
   t.same(result, ['changed argument']);
 });
 
-test('rejects on timeout', async function(t) {
+test('rejects on timeout', async function(t: any) {
   const emitter = new EventEmitter();
   t.plan(1);
   
   try {
-    const result = await once(emitter, 'changed', { timeout: 100 });
-    t.fail(result);
+    await once(emitter, 'changed', { timeout: 100 });
   } catch (error) {
     t.ok(error);
   }
 });
 
-test('resolves when resolveOn returns true', async function(t) {
+test('resolves when resolveOn returns true', async function(t: any) {
   const emitter = new EventEmitter();
   t.plan(1);
 
   try {
     const promise = once(emitter, 'changed', {
       timeout: 100,
-      resolveOn: (...args) => (args[0] === 'changed argument')
+      resolveOn: (...args: string[]) => (args[0] === 'changed argument')
     });
 
     emitter.emit('not changed', 'not changed argument');
@@ -58,36 +57,35 @@ test('resolves when resolveOn returns true', async function(t) {
   }
 });
 
-test('rejects when rejectOn returns true', async function(t) {
+test('rejects when rejectOn returns true', async function(t: any) {
   const emitter = new EventEmitter();
   t.plan(1);
 
   try {
     const promise = once(emitter, 'changed', {
       timeout: 100,
-      rejectOn: (...args) => (args[0] === 'changed argument')
+      rejectOn: (...args: string[]) => (args[0] === 'changed argument')
     });
 
     emitter.emit('not changed', 'not changed argument');
     emitter.emit('still not changed', 'still not changed argument');
     emitter.emit('changed', 'changed argument');
 
-    const result = await promise;
-    t.fail(result);
+    await promise;
   } catch (error) {
     t.ok(error);
   }
 });
 
-test('resolves when event that satisfies resolvesOn is emitted before one that satisfies rejectsOn', async function(t) {
+test('resolves when event that satisfies resolvesOn is emitted before one that satisfies rejectsOn', async function(t: any) {
   const emitter = new EventEmitter();
   t.plan(1);
 
   try {
     const promise = once(emitter, 'changed', {
       timeout: 100,
-      resolveOn: (...args) => (args[0] === 'pass'),
-      rejectOn: (...args) => (args[0] === 'fail')
+      resolveOn: (...args: string[]) => (args[0] === 'pass'),
+      rejectOn: (...args: string[]) => (args[0] === 'fail')
     });
 
     emitter.emit('changed', 'pass');
@@ -100,22 +98,21 @@ test('resolves when event that satisfies resolvesOn is emitted before one that s
   }
 });
 
-test('rejects when event that satisfies rejectsOn is emitted before one that satisfies resolvesOn', async function(t) {
+test('rejects when event that satisfies rejectsOn is emitted before one that satisfies resolvesOn', async function(t: any) {
   const emitter = new EventEmitter();
   t.plan(1);
 
   try {
-    const promise = once(emitter, 'changed', {
+    const promise: Promise<string> = once(emitter, 'changed', {
       timeout: 100,
-      resolveOn: (...args) => (args[0] === 'pass'),
-      rejectOn: (...args) => (args[0] === 'fail')
+      resolveOn: (...args: string[]) => (args[0] === 'pass'),
+      rejectOn: (...args: string[]) => (args[0] === 'fail')
     });
 
     emitter.emit('changed', 'fail');
     emitter.emit('changed', 'pass');
 
-    const result = await promise;
-    t.fail(result);
+    await promise;
   } catch (error) {
     t.ok(error);
   }
