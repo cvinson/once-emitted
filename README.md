@@ -5,6 +5,11 @@
 
 ## Installation
 
+```bash
+npm install once-emitted
+
+yarn add once-emitted
+```
 
 ## API
 
