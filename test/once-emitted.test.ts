@@ -29,7 +29,7 @@ test('rejects on timeout', async function(t: any) {
   t.plan(1);
   
   try {
-    await once(emitter, 'changed', { timeout: 100 });
+    await once(emitter, 'changed', { timeout: 50 });
   } catch (error) {
     t.ok(error);
   }
